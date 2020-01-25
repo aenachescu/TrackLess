@@ -1,10 +1,10 @@
 var isChrome = true;
 if (typeof chrome !== "undefined") {
     if (typeof browser !== "undefined") {
-        console.info("detected firefox");
+        // console.info("detected firefox");
         isChrome = false;
     } else {
-        console.info("detected chrome");
+        // console.info("detected chrome");
     }
 }
 
@@ -58,7 +58,7 @@ function loadSettings(cbk)
         browser.storage.local.get()
             .then(
                 function(settings) {
-                    console.info("firefox settings loaded");
+                    // console.info(`firefox settings loaded ${JSON.stringify(settings)}`);
                     cbk(settings);
                 },
                 function(error) {
@@ -69,7 +69,7 @@ function loadSettings(cbk)
         chrome.storage.local.get(
             null,
             function(settings) {
-                console.info("chrome settings loaded");
+                // console.info(`chrome settings loaded ${JSON.stringify(settings)}`);
                 cbk(settings);
             }
         );
@@ -82,7 +82,7 @@ function saveSettings(settings, cbk)
         browser.storage.local.set(settings)
             .then(
                 function() {
-                    console.info("firefox settings saved");
+                    // console.info(`firefox settings saved ${JSON.stringify(settings)}`);
                     cbk(settings);
                 },
                 function(error) {
@@ -93,7 +93,7 @@ function saveSettings(settings, cbk)
         chrome.storage.local.set(
             settings,
             function() {
-                console.info("chrome settings saved");
+                // console.info(`chrome settings saved ${JSON.stringify(settings)}`);
                 cbk(settings);
             }
         )
@@ -111,8 +111,8 @@ function onBeforeRequestCbk(details)
     if (details.url) {
         var result = removeTrackingParameters(details.url);
         if (result.modified === true) {
-            console.info(`original url: ${details.url}`);
-            console.info(`modified url: ${result.url}`);
+            // console.info(`original url: ${details.url}`);
+            // console.info(`modified url: ${result.url}`);
             return {
                 redirectUrl: result.url
             };
@@ -124,7 +124,7 @@ function onBeforeRequestCbk(details)
 
 function enableProxy()
 {
-    console.info("enable proxy");
+    // console.info("enable proxy");
     if (g_proxyEnabled === true)
         return;
 
@@ -139,15 +139,17 @@ function enableProxy()
             "blocking"
         ]
     );
+    g_proxyEnabled = true;
 }
 
 function disableProxy()
 {
-    console.info("disable proxy");
+    // console.info("disable proxy");
     if (g_proxyEnabled === false)
         return;
 
     chrome.webRequest.onBeforeRequest.removeListener(onBeforeRequestCbk);
+    g_proxyEnabled = false;
 }
 
 //
@@ -157,7 +159,7 @@ function disableProxy()
 function onInstalledCbk(details)
 {
     if (details.reason === "install") {
-        console.info("installing");
+        // console.info("installing");
         saveSettings(
             {
                 status: "enabled"
@@ -175,9 +177,9 @@ chrome.runtime.onInstalled.addListener(onInstalledCbk);
 
 function init()
 {
-    console.info("init");
+    // console.info("init");
     loadSettings(processingSettings);
-    browser.runtime.onMessage.addListener(processingMessage);
+    chrome.runtime.onMessage.addListener(processingMessage);
 }
 
 function processingSettings(settings)
@@ -192,15 +194,21 @@ function processingSettings(settings)
 
 function processingMessage(message, sender, sendResponse)
 {
-    console.info(`${JSON.stringify(message)}`);
+    // console.info(`${JSON.stringify(message)}`);
 
     if (message.type === "getSettings") {
-        loadSettings( function(settings) {
-            // sendResponse(settings);
-            sendResponse({"ceva":"Asd"});
-        });
-        //sendResponse({"ceva":"Asd"});
+        loadSettings(sendResponse);
+        return true;
+    } else if (message.type === "changeSettings") {
+        saveSettings(
+            {
+                "status": message.status
+            },
+            processingSettings
+        );
     }
+
+    return false;
 }
 
 init();

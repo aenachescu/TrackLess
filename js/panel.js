@@ -1,31 +1,39 @@
 function enableHandleClick(cb)
 {
-    console.info("aici");
     if (this.checked === true) {
-        browser.runtime.sendMessage({
-            "type": "changeSettings",
-            "status":"enabled"
-        });
+        chrome.runtime.sendMessage(
+            {
+                "type": "changeSettings",
+                "status":"enabled"
+            }
+        );
     } else {
-        browser.runtime.sendMessage({
-            "type": "changeSettings",
-            "status":"disabled"
-        });
+        chrome.runtime.sendMessage(
+            {
+                "type": "changeSettings",
+                "status":"disabled"
+            }
+        );
     }
 }
 
 function initPanel()
 {
-    console.info("init panel");
+    // console.info("init panel");
 
-    browser.runtime.sendMessage({
-        "type": "getSettings"
-    }).then( function(response) {
-        var checkboxElement = document.getElementById('enableCheckboxId');
-        checkboxElement.onclick = enableHandleClick;
+    chrome.runtime.sendMessage(
+        {
+            "type": "getSettings"
+        },
+        function(response) {
+            var checkboxElement = document.getElementById('enableCheckboxId');
+            checkboxElement.onclick = enableHandleClick;
+            checkboxElement.checked = false;
 
-        console.info(`primit: ${JSON.stringify(response)}`);
-    });
+            if (response.status === "enabled")
+                checkboxElement.checked = true;
+        }
+    );
 }
 
 initPanel();
