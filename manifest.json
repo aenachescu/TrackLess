@@ -9,13 +9,26 @@
     "permissions": [
       "webRequest",
       "webRequestBlocking",
-      "<all_urls>"
+      "<all_urls>",
+      "storage"
     ],
 
     "background": {
         "scripts": [
-            "js/proxy.js",
-            "js/core.js"
+            "js/background.js"
         ]
+    },
+
+    "icons": {
+        "48": "icons/icon96.png",
+        "96": "icons/icon96.png"
+    },
+
+    "content_security_policy": "script-src 'self'; object-src 'self'",
+
+    "browser_action": {
+        "default_title": "TrackLess",
+        "default_icon": "icons/icon96.png",
+        "default_popup": "html/settings.html"
     }
 }
