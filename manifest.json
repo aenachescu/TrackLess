@@ -1,16 +1,16 @@
 {
     "manifest_version": 2,
     "name": "TrackLess",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "description": "Remove tracking parameters from URLs.",
     "homepage_url": "https://github.com/aenachescu/TrackLess",
     "author": "Alin Enachescu",
 
     "permissions": [
-      "webRequest",
-      "webRequestBlocking",
-      "<all_urls>",
-      "storage"
+        "webRequest",
+        "webRequestBlocking",
+        "<all_urls>",
+        "storage"
     ],
 
     "background": {
